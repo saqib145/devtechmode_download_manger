@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Creator Manager | TikTok Bulk Downloader Interface</title>
+    <!-- Bootstrap 5 CSS + Icons + Google Fonts for modern look -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: #f0f2f5;
+            padding: 2rem 1.5rem;
+        }
+        .card-custom {
+            border: none;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+            background-color: #ffffff;
+        }
+        .section-header {
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: -0.2px;
+            color: #1e293b;
+            border-left: 4px solid #fe2c55;
+            padding-left: 0.75rem;
+            margin-bottom: 1.2rem;
+        }
+        .label-sm {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #5b6e8c;
+        }
+        .form-control, .form-select {
+            border-radius: 0.9rem;
+            border: 1px solid #e2e8f0;
+            background: #fefefe;
+            font-size: 0.85rem;
+            padding: 0.5rem 0.85rem;
+            transition: 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #fe2c55;
+            box-shadow: 0 0 0 3px rgba(254,44,85,0.2);
+        }
+        .btn-tiktok {
+            background: #fe2c55;
+            border: none;
+            border-radius: 2rem;
+            padding: 0.45rem 1.2rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: white;
+            transition: all 0.2s;
+        }
+        .btn-tiktok:hover {
+            background: #da1e44;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(254,44,85,0.3);
+        }
+        .btn-outline-tiktok {
+            background: transparent;
+            border: 1px solid #cbd5e1;
+            border-radius: 2rem;
+            font-weight: 500;
+            font-size: 0.75rem;
+            padding: 0.4rem 1rem;
+            color: #1e293b;
+        }
+        .btn-outline-tiktok:hover {
+            background: #f8fafc;
+            border-color: #fe2c55;
+        }
+        .badge-creator {
+            background: #f1f5f9;
+            color: #0f172a;
+            padding: 0.5rem 1rem;
+            border-radius: 1.2rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: 0.1s;
+        }
+        .queue-item {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 0.6rem 1rem;
+            border-left: 3px solid #94a3b8;
+        }
+        .split-group {
+            background: #f9f9fc;
+            border-radius: 1rem;
+            padding: 0.75rem;
+            border: 1px solid #edf2f7;
+        }
+        .status-ready {
+            font-size: 0.75rem;
+            background: #e6f7e6;
+            color: #2b7e3a;
+            border-radius: 2rem;
+            padding: 0.2rem 0.8rem;
+            display: inline-block;
+        }
+        hr {
+            margin: 1rem 0;
+            background-color: #e9edf2;
+        }
+        .footer-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 1.2rem;
+        }
+        .table-creators td {
+            vertical-align: middle;
+            font-size: 0.8rem;
+            padding: 0.7rem 0.2rem;
+        }
+        .import-export-bar {
+            background: #f9fafb;
+            border-radius: 1rem;
+            padding: 0.6rem 1rem;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .split-group .row > div {
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-lg px-0 px-md-2">
+    <!-- Main interface header: # File + Help + Profiles Download section title -->
+    <div class="d-flex flex-wrap align-items-baseline justify-content-between mb-3">
+        <div class="d-flex align-items-center gap-3">
+            <h1 class="h3 mb-0 fw-bold" style="color:#0f172a;"><i class="bi bi-filetype-py me-2" style="color:#fe2c55;"></i># File</h1>
+            <span class="text-muted fs-6"><i class="bi bi-question-circle-fill me-1"></i> Help</span>
+        </div>
+        <div class="mt-2 mt-sm-0">
+            <span class="badge bg-light text-dark p-2 px-3 rounded-pill border"><i class="bi bi-download me-1"></i> Profiles Download</span>
+        </div>
+    </div>
+
+    <!-- Main two columns: left (creator add form) + right (managed + queue) -->
+    <div class="row g-4">
+        <!-- LEFT COLUMN: ADD CREATOR & settings -->
+        <div class="col-lg-5 col-xl-4">
+            <div class="card-custom card p-3 p-xl-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-person-plus-fill me-2" style="color:#fe2c55;"></i> Profiles Management</h5>
+                    <span class="label-sm">Creator Link</span>
+                </div>
+                <div class="mb-2 mt-1">
+                    <div class="bg-light p-2 rounded-3 d-inline-block">
+                        <span class="small text-muted">ID#</span>
+                        <strong class="ms-1">1</strong>
+                    </div>
+                </div>
+                
+                <!-- Creator Link input -->
+                <label class="label-sm mb-1">Creator Link:</label>
+                <div class="input-group mb-3">
+                    <span class="input-group-text bg-white border-end-0 rounded-start-3"><i class="bi bi-link-45deg"></i></span>
+                    <input type="text" class="form-control" id="creatorLinkInput" placeholder="https://www.tiktok.com/@username" value="https://www.tiktok.com/@username">
+                </div>
+                
+                <!-- Split? Dur: Method: Time Parts: Parts: 2   (full row) -->
+                <div class="split-group mb-3">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-6 col-sm-3">
+                            <div class="label-sm mb-1">Split?</div>
+                            <select class="form-select form-select-sm" id="splitToggle">
+                                <option selected>No</option>
+                                <option>Yes</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <div class="label-sm mb-1">Dur:</div>
+                            <input type="text" class="form-control form-control-sm" placeholder="30s" value="30s">
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <div class="label-sm mb-1">Method:</div>
+                            <select class="form-select form-select-sm">
+                                <option>Time</option>
+                                <option>Parts</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-sm-3">
+                            <div class="label-sm mb-1">Parts:</div>
+                            <input type="number" class="form-control form-control-sm" value="2">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row g-2 mb-3">
+                    <div class="col-md-4">
+                        <label class="label-sm mb-1">Max Vids:</label>
+                        <input type="text" class="form-control form-control-sm" placeholder="0" value="0">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="label-sm mb-1">Popular Tab</label>
+                        <select class="form-select form-select-sm">
+                            <option>Random</option>
+                            <option>Trending</option>
+                            <option>Latest</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="label-sm mb-1">Random</label>
+                        <select class="form-select form-select-sm">
+                            <option>Off</option>
+                            <option selected>On</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Output Folder optional -->
+                <div class="mb-2">
+                    <label class="label-sm mb-1">Output Folder (Optional):</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Default folder if empty" value="">
+                        <button class="btn btn-outline-secondary rounded-end-3" type="button"><i class="bi bi-folder2-open"></i> BROWSE</button>
+                    </div>
+                    <div class="form-text small text-muted mt-1">Default folder if empty</div>
+                </div>
+                
+                <!-- ADD CREATOR button -->
+                <div class="d-grid gap-2 mt-3">
+                    <button class="btn btn-tiktok py-2" id="addCreatorBtn"><i class="bi bi-plus-circle me-1"></i> ADD CREATOR</button>
+                </div>
+            </div>
+            
+            <!-- Download Queue small widget (mirror) -->
+            <div class="card-custom card p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h6 class="fw-bold mb-0"><i class="bi bi-stack me-1"></i> Download Queue</h6>
+                    <i class="bi bi-chevron-down text-muted"></i>
+                </div>
+                <hr class="my-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="small text-secondary"><i class="bi bi-inbox me-1"></i> Download Queue</span>
+                    <span class="status-ready"><i class="bi bi-check-circle-fill me-1"></i> Ready - No downloads in queue</span>
+                </div>
+                <div class="mt-2 small text-muted border-top pt-2" id="queuePreviewMsg">
+                    <i class="bi bi-arrow-repeat me-1"></i> Queue idle · waiting for tasks
+                </div>
+            </div>
+        </div>
+        
+        <!-- RIGHT COLUMN: Managed Creators + IMPORT/EXPORT + Buttons row -->
+        <div class="col-lg-7 col-xl-8">
+            <!-- Managed Creators panel -->
+            <div class="card-custom card p-3 p-xl-4 mb-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-people-fill me-2"></i> Managed Creators</h5>
+                    <div class="import-export-bar mt-2 mt-sm-0 d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-tiktok" id="importDemoBtn"><i class="bi bi-file-arrow-up"></i> IMPORT</button>
+                        <button class="btn btn-sm btn-outline-tiktok" id="exportDemoBtn"><i class="bi bi-download"></i> EXPORT</button>
+                        <button class="btn btn-sm btn-outline-tiktok" id="applyAllSettingsBtn"><i class="bi bi-gear-wide-connected"></i> Apply Settings to All</button>
+                    </div>
+                </div>
+                
+                <!-- Creators list table styled -->
+                <div class="table-responsive">
+                    <table class="table table-creators mb-0">
+                        <thead class="table-light">
+                            <tr class="small text-secondary">
+                                <th style="width: 40%">Creator Link</th>
+                                <th>Split/Options</th>
+                                <th>Max Vids</th>
+                                <th style="width: 70px"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="creatorsTableBody">
+                            <!-- dynamic creators injected here -->
+                            <tr class="text-center text-muted" id="emptyRowMsg">
+                                <td colspan="4">No creators added. Use the form to add a profile.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-2 small text-muted fst-italic">
+                    <i class="bi bi-info-circle"></i> Each creator appears here. Click "Apply Settings to All" to copy current left-panel settings.
+                </div>
+            </div>
+            
+            <!-- BUTTON BAR: Browse (duplicate from left but fits design), Launch Download, STOP, Daily schedule, Daily Guard, RESET APP, CLEAR HISTORY, SAVE ALL -->
+            <div class="card-custom card p-3 p-xl-4">
+                <div class="row g-2 align-items-center">
+                    <div class="col-12">
+                        <div class="footer-buttons flex-wrap">
+                            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3"><i class="bi bi-folder-symlink"></i> BROWSE</button>
+                            <button class="btn btn-tiktok px-4" id="launchDownloadBtn"><i class="bi bi-play-fill"></i> Launch Download</button>
+                            <button class="btn btn-outline-danger btn-sm rounded-pill px-3"><i class="bi bi-stop-circle"></i> STOP</button>
+                            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3"><i class="bi bi-calendar-event"></i> Daily schedule</button>
+                            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3"><i class="bi bi-shield-lock"></i> Daily Guard: Inactive</button>
+                            <button class="btn btn-outline-warning btn-sm rounded-pill px-3" id="resetAppBtn"><i class="bi bi-arrow-repeat"></i> RESET APP</button>
+                            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="clearHistoryBtn"><i class="bi bi-trash3"></i> CLEAR HISTORY</button>
+                            <button class="btn btn-outline-success btn-sm rounded-pill px-3" id="saveAllBtn"><i class="bi bi-save2"></i> SAVE ALL</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3 pt-1 border-top d-flex justify-content-between align-items-center">
+                    <div class="small text-muted"><i class="bi bi-clock-history"></i> Daily schedule inactive · Queue manager ready</div>
+                    <div><span class="badge bg-light text-dark border">Creator Manager v1.0</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- small additional status toast / notification area (optional inline) -->
+    <div class="mt-3 text-center small text-muted">
+        <i class="bi bi-database"></i> Profiles Management ready | Use "ADD CREATOR" to build list
+    </div>
+</div>
+
+<!-- Bootstrap JS + Popper (for any interactive toasts not mandatory but needed for proper behavior) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // --- DATA MODEL ---
+    let creators = [];   // each creator: { id, link, splitOption, duration, method, parts, maxVids, popularTab, randomFlag, outputFolder? optional but we store simplified }
+    // We'll store with default params exactly as left panel state at time of adding
+    // Helper: read current left panel configuration
+    function getCurrentLeftConfig() {
+        const splitVal = document.getElementById('splitToggle').value;  // "Yes" or "No"
+        const durInput = document.querySelector('.split-group input[placeholder="30s"]') ? 
+            document.querySelector('.split-group input[placeholder="30s"]').value : "30s";
+        const methodSelect = document.querySelector('.split-group select:nth-of-type(2)') ? 
+            document.querySelector('.split-group select:nth-of-type(2)').value : "Time";
+        const partsInput = document.querySelector('.split-group input[type="number"]') ? 
+            document.querySelector('.split-group input[type="number"]').value : 2;
+        const maxVidsInput = document.querySelector('.row.g-2 .col-md-4 input') ? 
+            document.querySelector('.row.g-2 .col-md-4 input').value : "0";
+        const popularSelect = document.querySelector('.row.g-2 .col-md-4 select') ? 
+            document.querySelector('.row.g-2 .col-md-4 select').value : "Random";
+        const randomSelect = document.querySelectorAll('.row.g-2 .col-md-4 select')[1] ? 
+            document.querySelectorAll('.row.g-2 .col-md-4 select')[1].value : "On";
+        const outputFolderInput = document.querySelector('.input-group input[placeholder="Default folder if empty"]') ? 
+            document.querySelector('.input-group input[placeholder="Default folder if empty"]').value : "";
+        return {
+            split: splitVal,
+            duration: durInput,
+            method: methodSelect,
+            parts: partsInput,
+            maxVids: maxVidsInput,
+            popularTab: popularSelect,
+            randomFlag: randomSelect,
+            outputFolder: outputFolderInput
+        };
+    }
+
+    // function to render the creators table
+    function renderCreatorsTable() {
+        const tbody = document.getElementById('creatorsTableBody');
+        if (!tbody) return;
+        if (creators.length === 0) {
+            tbody.innerHTML = `<tr class="text-center text-muted" id="emptyRowMsg"><td colspan="4">No creators added. Use the form to add a profile.</td></tr>`;
+            return;
+        }
+        let html = '';
+        creators.forEach((creator, idx) => {
+            const splitInfo = creator.split === 'Yes' ? `Split:${creator.method} ${creator.parts}parts` : 'No split';
+            const maxVidStr = creator.maxVids === '0' ? '∞' : creator.maxVids;
+            html += `
+                <tr>
+                    <td class="fw-semibold small">
+                        <i class="bi bi-tiktok me-1" style="color:#000;"></i> 
+                        <a href="#" class="text-decoration-none text-dark" onclick="return false;">${escapeHtml(creator.link)}</a>
+                        <div class="text-muted small">ID#${creator.id}</div>
+                    </td>
+                    <td class="small">${splitInfo}<br><span class="text-muted">${creator.popularTab} / ${creator.randomFlag}</span></td>
+                    <td class="small">${maxVidStr}</td>
+                    <td><button class="btn btn-sm btn-outline-danger rounded-circle remove-creator" data-idx="${idx}" style="width: 30px; height: 30px; padding:0;"><i class="bi bi-x-lg"></i></button></td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+        // attach remove events
+        document.querySelectorAll('.remove-creator').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.getAttribute('data-idx'));
+                if (!isNaN(idx)) {
+                    creators.splice(idx, 1);
+                    renderCreatorsTable();
+                    showToastMessage(`Creator removed from managed list`, "info");
+                    updateQueuePreview();
+                }
+                e.stopPropagation();
+            });
+        });
+    }
+
+    // helper escapeHtml
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+
+    // add creator from left panel info and link input
+    function addCreatorFromForm() {
+        const linkInput = document.getElementById('creatorLinkInput');
+        let rawLink = linkInput.value.trim();
+        if (!rawLink) {
+            showToastMessage("❌ Please enter a valid TikTok creator link", "danger");
+            return;
+        }
+        // Simple URL validation hint
+        if (!rawLink.includes('tiktok.com/@') && !rawLink.includes('tiktok.com')) {
+            if(!confirm('Link does not look like standard TikTok profile. Continue anyway?')) return;
+        }
+        const config = getCurrentLeftConfig();
+        const newId = creators.length > 0 ? Math.max(...creators.map(c => c.id)) + 1 : 1;
+        creators.push({
+            id: newId,
+            link: rawLink,
+            split: config.split,
+            duration: config.duration,
+            method: config.method,
+            parts: config.parts,
+            maxVids: config.maxVids,
+            popularTab: config.popularTab,
+            randomFlag: config.randomFlag,
+            outputFolder: config.outputFolder
+        });
+        renderCreatorsTable();
+        // reset link input with default placeholder but keep some example?
+        linkInput.value = "https://www.tiktok.com/@new_creator";
+        showToastMessage(`✅ Creator added: ${rawLink.substring(0, 40)}...`, "success");
+        updateQueuePreview();
+    }
+
+    // Apply settings to all creators: copies current left panel configs to each creator
+    function applySettingsToAll() {
+        if (creators.length === 0) {
+            showToastMessage("No creators to update. Add some first.", "warning");
+            return;
+        }
+        const current = getCurrentLeftConfig();
+        creators = creators.map(creator => ({
+            ...creator,
+            split: current.split,
+            duration: current.duration,
+            method: current.method,
+            parts: current.parts,
+            maxVids: current.maxVids,
+            popularTab: current.popularTab,
+            randomFlag: current.randomFlag,
+            outputFolder: current.outputFolder
+        }));
+        renderCreatorsTable();
+        showToastMessage(`⚙️ Settings applied to ${creators.length} creator(s).`, "info");
+    }
+
+    // simple toast style (non-intrusive)
+    function showToastMessage(msg, type = "info") {
+        // create temp toast floating element
+        const toastDiv = document.createElement('div');
+        toastDiv.className = `position-fixed bottom-0 start-50 translate-middle-x mb-3 p-2 px-4 rounded-pill shadow-lg text-white bg-${type === 'danger' ? 'danger' : (type === 'success' ? 'success' : 'dark')}`;
+        toastDiv.style.zIndex = "9999";
+        toastDiv.style.fontSize = "0.8rem";
+        toastDiv.style.fontWeight = "500";
+        toastDiv.innerText = msg;
+        document.body.appendChild(toastDiv);
+        setTimeout(() => {
+            toastDiv.style.opacity = '0';
+            setTimeout(() => toastDiv.remove(), 500);
+        }, 2200);
+    }
+
+    // Download queue preview (dynamically update text)
+    function updateQueuePreview() {
+        const queueElem = document.getElementById('queuePreviewMsg');
+        if (queueElem) {
+            if (creators.length > 0) {
+                queueElem.innerHTML = `<i class="bi bi-hourglass-split me-1"></i> Queue ready · ${creators.length} profile(s) managed. Press "Launch Download" to start.`;
+            } else {
+                queueElem.innerHTML = `<i class="bi bi-arrow-repeat me-1"></i> Queue idle · No creators added. Please add profiles.`;
+            }
+        }
+        // Also update main queue status bar
+        const queueStatusSpan = document.querySelector('.status-ready');
+        if (queueStatusSpan) {
+            if (creators.length > 0) {
+                queueStatusSpan.innerHTML = `<i class="bi bi-download me-1"></i> Ready · ${creators.length} pending`;
+                queueStatusSpan.classList.add('bg-warning-subtle', 'text-dark');
+                queueStatusSpan.classList.remove('bg-success-subtle');
+            } else {
+                queueStatusSpan.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i> Ready - No downloads in queue`;
+                queueStatusSpan.classList.remove('bg-warning-subtle');
+            }
+        }
+    }
+
+    // reset app: clear all creators, reset left form to default values
+    function resetApp() {
+        if (confirm("RESET APP will delete all managed creators and reset form fields. Continue?")) {
+            creators = [];
+            renderCreatorsTable();
+            // reset left fields
+            document.getElementById('creatorLinkInput').value = "https://www.tiktok.com/@username";
+            document.getElementById('splitToggle').value = "No";
+            const durField = document.querySelector('.split-group input[placeholder="30s"]');
+            if (durField) durField.value = "30s";
+            const methodSelect = document.querySelectorAll('.split-group select')[1];
+            if (methodSelect) methodSelect.value = "Time";
+            const partsNum = document.querySelector('.split-group input[type="number"]');
+            if (partsNum) partsNum.value = 2;
+            const maxVidField = document.querySelector('.row.g-2 .col-md-4 input');
+            if (maxVidField) maxVidField.value = "0";
+            const popularSelects = document.querySelectorAll('.row.g-2 .col-md-4 select');
+            if (popularSelects[0]) popularSelects[0].value = "Random";
+            if (popularSelects[1]) popularSelects[1].value = "On";
+            const outputFolder = document.querySelector('.input-group input[placeholder="Default folder if empty"]');
+            if (outputFolder) outputFolder.value = "";
+            showToastMessage("🔄 App reset complete. All creators cleared.", "info");
+            updateQueuePreview();
+        }
+    }
+
+    function clearHistory() {
+        showToastMessage("🧹 Download history cleared (simulated). No active tasks.", "info");
+        // optional effect on queue message
+        const queueMsg = document.getElementById('queuePreviewMsg');
+        if(queueMsg) queueMsg.innerHTML = `<i class="bi bi-eraser me-1"></i> History cleared. Queue memory reset.`;
+        setTimeout(() => updateQueuePreview(), 1500);
+    }
+
+    function saveAll() {
+        showToastMessage(`💾 Saved current config and ${creators.length} creators to local storage (sim)`, "success");
+        // extra: store in localStorage for demo persistence
+        try {
+            localStorage.setItem('creators_backup', JSON.stringify(creators));
+            localStorage.setItem('lastConfig', JSON.stringify(getCurrentLeftConfig()));
+            showToastMessage("Backup saved to browser storage.", "success");
+        } catch(e) {}
+    }
+
+    function launchDownload() {
+        if (creators.length === 0) {
+            showToastMessage("❌ Download Queue is empty. Add creators first.", "danger");
+        } else {
+            showToastMessage(`🚀 Launching download for ${creators.length} creator(s)... (simulated)`, "success");
+            // Additional update to queue status
+            const queueBadge = document.querySelector('.status-ready');
+            if (queueBadge) queueBadge.innerHTML = `<i class="bi bi-arrow-repeat me-1"></i> Downloading...`;
+            setTimeout(() => {
+                if(queueBadge && creators.length) queueBadge.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i> Ready - Completed simulation`;
+                setTimeout(() => updateQueuePreview(), 1200);
+            }, 1200);
+        }
+    }
+
+    function importDemo() {
+        // dummy import: preload some example creators
+        const exampleCreators = [
+            { id: 101, link: "https://www.tiktok.com/@example1", split:"No", duration:"45s", method:"Time", parts:2, maxVids:"5", popularTab:"Popular", randomFlag:"Random", outputFolder:"" },
+            { id: 102, link: "https://www.tiktok.com/@creator_beats", split:"Yes", duration:"60s", method:"Parts", parts:3, maxVids:"10", popularTab:"Trending", randomFlag:"Off", outputFolder:"" }
+        ];
+        // avoid duplicates but merge
+        let nextId = creators.length > 0 ? Math.max(...creators.map(c=>c.id), 0) + 1 : 1;
+        for (let ex of exampleCreators) {
+            creators.push({ ...ex, id: nextId++ });
+        }
+        renderCreatorsTable();
+        updateQueuePreview();
+        showToastMessage("📂 Imported 2 example creators.", "success");
+    }
+
+    function exportCreators() {
+        const dataStr = JSON.stringify(creators, null, 2);
+        const blob = new Blob([dataStr], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `creators_export_${new Date().toISOString().slice(0,19)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToastMessage("📤 Exported creators list as JSON", "info");
+    }
+
+    // Event binding after DOM
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('addCreatorBtn').addEventListener('click', addCreatorFromForm);
+        document.getElementById('applyAllSettingsBtn').addEventListener('click', applySettingsToAll);
+        document.getElementById('resetAppBtn').addEventListener('click', resetApp);
+        document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
+        document.getElementById('saveAllBtn').addEventListener('click', saveAll);
+        document.getElementById('launchDownloadBtn').addEventListener('click', launchDownload);
+        document.getElementById('importDemoBtn').addEventListener('click', importDemo);
+        document.getElementById('exportDemoBtn').addEventListener('click', exportCreators);
+        // initial render
+        renderCreatorsTable();
+        updateQueuePreview();
+        // optional load from localStorage?
+        const storedCreators = localStorage.getItem('creators_backup');
+        if(storedCreators && confirm("Previous session backup found. Load last creators?")) {
+            try {
+                const parsed = JSON.parse(storedCreators);
+                if(Array.isArray(parsed)) {
+                    creators = parsed;
+                    renderCreatorsTable();
+                    updateQueuePreview();
+                    showToastMessage("Loaded previous creators from storage.", "success");
+                }
+            } catch(e) {}
+        }
+    });
+</script>
+</body>
+</html>
